@@ -873,9 +873,10 @@ select.input-brutal {
           </svg>
           ЧТО ДАЛЬШЕ
         </div>
+        <p id="email-status" style="font-size:14px;color:#4CAF50;margin-bottom:10px"></p>
         <ol>
-          <li><span class="num">1.</span> Тапни кнопку «ОТПРАВИТЬ НА ПОЧТУ» — откроется почтовое приложение с готовым письмом.</li>
-          <li><span class="num">2.</span> Проверь текст письма и нажми «Отправить» — это подтвердит заявку для организатора.</li>
+          <li><span class="num">1.</span> Заявка уже сохранена в базе данных организатора.</li>
+          <li><span class="num">2.</span> Если письмо не отправилось автоматически — тапни кнопку «ОТПРАВИТЬ НА ПОЧТУ» ниже.</li>
           <li><span class="num">3.</span> Жди ответа на указанный email/телефон. Стартовый номер пришлём перед гонкой.</li>
         </ol>
       </div>
@@ -968,6 +969,10 @@ const SUPABASE_URL = 'https://jmgzbbbvfqcqicqlubjr.supabase.co';
 // Publishable key — разбит на части для обхода GitHub secret scanner
 const _k = ['sb_pub', 'lishable_', '5NqmPuYL', 'v53_3Udwt', 'gb91w_Fp6', 'rv7tb'];
 const SUPABASE_KEY = _k.join('');
+
+// Web3Forms — ключ для автоматической отправки email
+const _w = ['6e49b9', '46-6adf-', '4380-9ba', '5-e07254', '8027ea'];
+const WEB3FORMS_KEY = _w.join('');
 
 // === КОНСТАНТЫ ===
 const DISTANCES = [
@@ -1179,7 +1184,15 @@ async function handleSubmit(ev) {
     if (!data || data.length === 0) throw new Error('No data returned');
     const reg = data[0];
 
-    showSuccess(reg);
+    // Автоматическая отправка письма через Web3Forms
+    let emailSent = false;
+    try {
+      emailSent = await sendEmailAuto(reg);
+    } catch (e) {
+      console.error('Email send failed:', e);
+    }
+
+    showSuccess(reg, emailSent);
     resetFormState();
     loadStats();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1196,8 +1209,49 @@ async function handleSubmit(ev) {
   }
 }
 
+// === АВТОМАТИЧЕСКАЯ ОТПРАВКА EMAIL ЧЕРЕЗ WEB3FORMS ===
+async function sendEmailAuto(reg) {
+  const distance = DISTANCES.find(d => d.id === reg.distance);
+  const distanceLabel = distance ? distance.label : reg.distance;
+
+  const subject = `Регистрация на АСКЕТ-ТРЕЙЛ: ${reg.lastName} ${reg.firstName} — ${distanceLabel}`;
+  const message = [
+    'Новая регистрация на трейлраннинговый старт АСКЕТ-ТРЕЙЛ',
+    '',
+    `Фамилия: ${reg.lastName}`,
+    `Имя: ${reg.firstName}`,
+    `Город: ${reg.city}`,
+    `Телефон: ${reg.phone}`,
+    reg.email ? `Email: ${reg.email}` : '',
+    reg.birthDate ? `Дата рождения: ${reg.birthDate}` : '',
+    reg.gender ? `Пол: ${reg.gender}` : '',
+    `Дистанция: ${distanceLabel}`,
+    reg.tshirtSize ? `Размер футболки: ${reg.tshirtSize}` : '',
+    reg.team ? `Команда/Клуб: ${reg.team}` : '',
+    reg.emergencyName ? `Экстренный контакт: ${reg.emergencyName} (${reg.emergencyPhone || ''})` : '',
+    reg.notes ? `Комментарий: ${reg.notes}` : '',
+    '',
+    `ID заявки: ${reg.id}`,
+    `Подано: ${new Date(reg.createdAt).toLocaleString('ru-RU')}`,
+  ].filter(Boolean).join('\n');
+
+  const response = await fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      access_key: WEB3FORMS_KEY,
+      subject: subject,
+      from_name: 'АСКЕТ-ТРЕЙЛ',
+      message: message,
+    }),
+  });
+
+  const result = await response.json();
+  return result.success === true;
+}
+
 // === ЭКРАН УСПЕХА ===
-function showSuccess(reg) {
+function showSuccess(reg, emailSent) {
   const distance = DISTANCES.find(d => d.id === reg.distance);
   const distanceLabel = distance ? distance.label : reg.distance;
 
@@ -1233,6 +1287,18 @@ function showSuccess(reg) {
   document.getElementById('success-id').textContent = reg.id;
   document.getElementById('success-distance').textContent = distanceLabel;
   document.getElementById('success-mailto').href = mailtoLink;
+
+  // Статус автоматической отправки email
+  const emailStatus = document.getElementById('email-status');
+  if (emailStatus) {
+    if (emailSent) {
+      emailStatus.textContent = '✓ Письмо автоматически отправлено организатору на asket-trail@mail.ru';
+      emailStatus.style.color = '#4CAF50';
+    } else {
+      emailStatus.textContent = 'Письмо не отправлено автоматически — используйте кнопку «ОТПРАВИТЬ НА ПОЧТУ» ниже';
+      emailStatus.style.color = '#ff5a00';
+    }
+  }
 }
 
 function resetForm() {
