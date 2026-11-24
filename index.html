@@ -971,11 +971,11 @@ const SUPABASE_KEY = _k.join('');
 
 // === КОНСТАНТЫ ===
 const DISTANCES = [
-  { id: 'd1', label: '№1', desc: 'Зачётная дистанция для начинающих' },
-  { id: 'd2', label: '№2', desc: 'Любительский вызов' },
-  { id: 'd3', label: '№3', desc: 'Трейловый полумарафон' },
-  { id: 'd4', label: '№4', desc: 'Полная дистанция — мастерство' },
-  { id: 'd5', label: '№5', desc: 'Ультрамарафон — только для подготовленных' },
+  { id: 'd1', label: '№1', desc: '' },
+  { id: 'd2', label: '№2', desc: '' },
+  { id: 'd3', label: '№3', desc: '' },
+  { id: 'd4', label: '№4', desc: '' },
+  { id: 'd5', label: '№5', desc: '' },
 ];
 const TSHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 const ORGANIZER_EMAIL = 'asket-trail@mail.ru';
@@ -1213,7 +1213,7 @@ function showSuccess(reg) {
     reg.email ? `Email: ${reg.email}` : null,
     reg.birthDate ? `Дата рождения: ${reg.birthDate}` : null,
     reg.gender ? `Пол: ${reg.gender}` : null,
-    `Дистанция: ${distanceLabel} (${distance?.desc || ''})`,
+    `Дистанция: ${distanceLabel}`,
     reg.tshirtSize ? `Размер футболки: ${reg.tshirtSize}` : null,
     reg.team ? `Команда/Клуб: ${reg.team}` : null,
     reg.emergencyName ? `Экстренный контакт: ${reg.emergencyName} (${reg.emergencyPhone || ''})` : null,
