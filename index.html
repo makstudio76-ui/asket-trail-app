@@ -228,6 +228,7 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+  align-items: start;
 }
 @media (min-width: 480px) {
   .field-grid.two { grid-template-columns: 1fr 1fr; }
@@ -244,6 +245,8 @@ body {
   text-transform: uppercase;
   color: var(--brand-yellow);
   margin-bottom: 6px;
+  min-height: 22px;
+  line-height: 22px;
 }
 .field-label .icon { color: var(--brand-orange); }
 .field-label .req { color: var(--brand-orange); }
