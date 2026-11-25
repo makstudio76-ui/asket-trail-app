@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Админка · АСКЕТ-ТРЕЙЛ</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--o:#ff5a00;--y:#ffd100;--b:#0a0a0a;--g:#181818}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--b);color:#fff;font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+    .hd{background:#000;border-bottom:2px solid var(--o);padding:12px 16px;display:flex;align-items:center;gap:12px;max-width:1200px;margin:0 auto}
+    .hd-logo{width:36px;height:36px;background:var(--o);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--b);border:2px solid var(--b)}
+    .hd-title{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--y);letter-spacing:.04em}
+    .hd-title .a{color:var(--o)}
+    .hd-sub{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.2em}
+    .hd-btn{background:transparent;border:2px solid #444;color:#999;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;margin-left:auto}
+    .hd-btn:hover{border-color:var(--o);color:var(--o)}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    /* Login */
+    .login-box{max-width:400px;margin:60px auto;border:2px solid var(--o);background:var(--g);padding:32px;text-align:center}
+    .login-box h1{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--y);letter-spacing:.04em;margin-bottom:8px}
+    .login-box p{font-size:14px;color:#888;margin-bottom:20px}
+    .login-input{width:100%;background:var(--b);border:2px solid #303030;color:#fff;padding:12px 14px;font-size:16px;margin-bottom:16px}
+    .login-input:focus{outline:none;border-color:var(--o)}
+    .btn{display:inline-block;background:var(--o);color:var(--b);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border:2px solid var(--b);cursor:pointer;text-decoration:none;text-align:center}
+    .btn:hover{background:var(--y)}
+    .btn-sm{font-size:14px;padding:6px 12px;border:1px solid #303030}
+    .btn-red{background:#c41e3a;color:#fff;border-color:#000}
+    .btn-red:hover{background:#e0294a}
+    .btn-yellow{background:var(--y);color:var(--b)}
+    /* Toolbar */
+    .toolbar{display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+    .toolbar .count{font-size:14px;color:#888}
+    .toolbar .count b{color:var(--o);font-family:'Bebas Neue',sans-serif;font-size:20px}
+    .toolbar .search{flex:1;min-width:200px;background:var(--g);border:2px solid #303030;color:#fff;padding:10px 14px;font-size:14px}
+    .toolbar .search:focus{outline:none;border-color:var(--o)}
+    /* Table */
+    .table-wrap{overflow-x:auto;border:2px solid var(--o);background:var(--g)}
+    table{width:100%;border-collapse:collapse;font-size:13px;min-width:800px}
+    th{background:var(--b);padding:10px;text-align:left;color:#777;text-transform:uppercase;font-size:11px;letter-spacing:.08em;position:sticky;top:0;border-bottom:2px solid var(--o)}
+    td{padding:10px;border-bottom:1px solid #222;color:#ccc;vertical-align:top}
+    td.name{color:#fff;font-weight:600}
+    td .sub{font-size:11px;color:#555;margin-top:2px}
+    td .email{font-size:11px;color:var(--o)}
+    td.dist{color:var(--y);font-family:'Bebas Neue',sans-serif;font-size:16px}
+    td.actions{white-space:nowrap}
+    .btn-del{background:transparent;border:1px solid #c41e3a;color:#c41e3a;padding:4px 10px;font-size:12px;cursor:pointer;font-family:'Oswald',sans-serif;text-transform:uppercase}
+    .btn-del:hover{background:#c41e3a;color:#fff}
+    .btn-edit{background:transparent;border:1px solid var(--o);color:var(--o);padding:4px 10px;font-size:12px;cursor:pointer;font-family:'Oswald',sans-serif;text-transform:uppercase;margin-right:4px}
+    .btn-edit:hover{background:var(--o);color:var(--b)}
+    .empty{text-align:center;padding:40px;color:#555}
+    /* Edit modal */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:50;display:none;align-items:center;justify-content:center;padding:16px}
+    .modal-bg.active{display:flex}
+    .modal{width:100%;max-width:500px;max-height:90vh;overflow-y:auto;background:var(--g);border:2px solid var(--o)}
+    .modal-hd{background:var(--o);color:var(--b);padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center}
+    .modal-close{background:var(--b);color:var(--o);border:none;padding:4px 12px;cursor:pointer;font-size:14px}
+    .modal-body{padding:20px}
+    .fld{margin-bottom:14px}
+    .fld label{display:block;font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--y);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+    .fld input,.fld select,.fld textarea{width:100%;background:var(--b);border:2px solid #303030;color:#fff;padding:10px 12px;font-size:14px}
+    .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--o)}
+    .fld-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .modal-actions{display:flex;gap:8px;margin-top:20px}
+    .modal-actions .btn{flex:1}
+    /* Toast */
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--o);color:var(--b);padding:12px 24px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em;z-index:100;display:none}
+    .toast.show{display:block}
+    .toast.err{background:#c41e3a;color:#fff}
+    /* Confirm */
+    .confirm-box{max-width:400px;margin:60px auto;border:2px solid #c41e3a;background:var(--g);padding:32px;text-align:center}
+    .confirm-box h2{font-family:'Bebas Neue',sans-serif;font-size:24px;color:#c41e3a;margin-bottom:12px}
+    .confirm-box p{font-size:14px;color:#ccc;margin-bottom:20px}
+    .confirm-actions{display:flex;gap:12px;justify-content:center}
+    .hidden{display:none!important}
+  </style>
+</head>
+<body>
+
+<div class="hd">
+  <div class="hd-logo">А</div>
+  <div>
+    <div class="hd-title">АСКЕТ<span class="a">—</span>ТРЕЙЛ · АДМИН</div>
+    <div class="hd-sub">панель управления заявками</div>
+  </div>
+  <a href="./" class="hd-btn">← На сайт</a>
+</div>
+
+<!-- LOGIN -->
+<div id="login-view" class="wrap">
+  <div class="login-box">
+    <h1>🔒 ВХОД В АДМИНКУ</h1>
+    <p>Введите пароль для доступа к заявкам</p>
+    <input type="password" class="login-input" id="pwd" placeholder="Пароль" autofocus>
+    <button class="btn" onclick="login()" style="width:100%">ВОЙТИ</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash-view" class="wrap hidden">
+  <div class="toolbar">
+    <div class="count">Заявок: <b id="cnt">0</b></div>
+    <input type="text" class="search" id="search" placeholder="🔍 Поиск по имени, городу, телефону..." oninput="filterTable()">
+    <button class="btn btn-sm btn-yellow" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn btn-sm" onclick="loadData()">↻ Обновить</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ФИО</th>
+          <th>Город</th>
+          <th>Телефон</th>
+          <th>Дист.</th>
+          <th>Футболка</th>
+          <th>Команда</th>
+          <th>Подано</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="edit-modal">
+  <div class="modal">
+    <div class="modal-hd">
+      Редактировать заявку
+      <button class="modal-close" onclick="closeEdit()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id">
+      <div class="fld-row">
+        <div class="fld"><label>Фамилия</label><input id="edit-lastName"></div>
+        <div class="fld"><label>Имя</label><input id="edit-firstName"></div>
+      </div>
+      <div class="fld-row">
+        <div class="fld"><label>Город</label><input id="edit-city"></div>
+        <div class="fld"><label>Телефон</label><input id="edit-phone"></div>
+      </div>
+      <div class="fld-row">
+        <div class="fld"><label>Email</label><input id="edit-email"></div>
+        <div class="fld"><label>Дата рождения</label><input type="date" id="edit-birthDate"></div>
+      </div>
+      <div class="fld-row">
+        <div class="fld"><label>Пол</label><select id="edit-gender"><option value="">—</option><option value="M">Мужской</option><option value="F">Женский</option></select></div>
+        <div class="fld"><label>Дистанция</label><select id="edit-distance"><option value="d1">№1</option><option value="d2">№2</option><option value="d3">№3</option><option value="d4">№4</option><option value="d5">№5</option></select></div>
+      </div>
+      <div class="fld-row">
+        <div class="fld"><label>Футболка</label><select id="edit-tshirtSize"><option value="">—</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>XXXL</option></select></div>
+        <div class="fld"><label>Команда</label><input id="edit-team"></div>
+      </div>
+      <div class="fld-row">
+        <div class="fld"><label>Экстр. контакт</label><input id="edit-emergencyName"></div>
+        <div class="fld"><label>Экстр. телефон</label><input id="edit-emergencyPhone"></div>
+      </div>
+      <div class="fld"><label>Комментарий</label><textarea id="edit-notes" rows="3"></textarea></div>
+      <div class="modal-actions">
+        <button class="btn" onclick="saveEdit()">💾 СОХРАНИТЬ</button>
+        <button class="btn btn-sm" onclick="closeEdit()" style="background:transparent;border:2px solid #444;color:#999">ОТМЕНА</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal-bg" id="del-modal">
+  <div class="confirm-box">
+    <h2>🗑 УДАЛИТЬ ЗАЯВКУ?</h2>
+    <p id="del-name" style="font-weight:600;color:#fff"></p>
+    <p>Это действие нельзя отменить.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-red" onclick="confirmDelete()">УДАЛИТЬ</button>
+      <button class="btn btn-sm" onclick="closeDelete()" style="background:transparent;border:2px solid #444;color:#999">ОТМЕНА</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SU='https://jmgzbbbvfqcqicqlubjr.supabase.co';
+const _k=['sb_pub','lishable_','5NqmPuYL','v53_3Udwt','gb91w_Fp6','rv7tb'];
+const SK=_k.join('');
+const PW='asket-trail-2026';
+const DISTANCES={d1:'№1',d2:'№2',d3:'№3',d4:'№4',d5:'№5'};
+let rows=[];
+let delId=null;
+
+function login(){
+  const p=document.getElementById('pwd').value;
+  if(p!==PW){toast('Неверный пароль','err');return;}
+  sessionStorage.setItem('admin_ok','1');
+  showDash();
+}
+
+function showDash(){
+  document.getElementById('login-view').classList.add('hidden');
+  document.getElementById('dash-view').classList.remove('hidden');
+  loadData();
+}
+
+async function loadData(){
+  try{
+    const r=await fetch(SU+'/rest/v1/Registration?order=createdAt.desc',{
+      headers:{'apikey':SK,'Authorization':'Bearer '+SK}
+    });
+    if(!r.ok)throw new Error(r.status);
+    rows=await r.json();
+    document.getElementById('cnt').textContent=rows.length;
+    renderTable(rows);
+  }catch(e){
+    toast('Ошибка загрузки: '+e.message,'err');
+  }
+}
+
+function renderTable(data){
+  const tb=document.getElementById('tbody');
+  if(!data||data.length===0){
+    tb.innerHTML='<tr><td colspan="8" class="empty">Заявок пока нет</td></tr>';
+    return;
+  }
+  tb.innerHTML=data.map(r=>`
+    <tr>
+      <td class="name">${esc(r.lastName)} ${esc(r.firstName)}
+        ${r.birthDate?`<div class="sub">📅 ${esc(r.birthDate)}</div>`:''}
+        ${r.email?`<div class="email">✉ ${esc(r.email)}</div>`:''}
+      </td>
+      <td>${esc(r.city)}</td>
+      <td><a href="tel:${esc(r.phone)}" style="color:var(--o)">${esc(r.phone)}</a>
+        ${r.emergencyName?`<div class="sub">экстр: ${esc(r.emergencyName)} ${esc(r.emergencyPhone||'')}</div>`:''}
+      </td>
+      <td class="dist">${DISTANCES[r.distance]||r.distance}</td>
+      <td>${esc(r.tshirtSize)||'—'}</td>
+      <td>${esc(r.team)||'—'}</td>
+      <td style="font-size:11px;color:#555">${new Date(r.createdAt).toLocaleString('ru-RU')}</td>
+      <td class="actions">
+        <button class="btn-edit" onclick="openEdit('${r.id}')">✎ Изм.</button>
+        <button class="btn-del" onclick="askDelete('${r.id}','${esc(r.lastName)} ${esc(r.firstName)}')">🗑 Удл.</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterTable(){
+  const q=document.getElementById('search').value.toLowerCase();
+  if(!q){renderTable(rows);return;}
+  const f=rows.filter(r=>{
+    const s=(r.lastName+' '+r.firstName+' '+r.city+' '+r.phone+' '+r.email+' '+r.team).toLowerCase();
+    return s.includes(q);
+  });
+  renderTable(f);
+}
+
+function openEdit(id){
+  const r=rows.find(x=>x.id===id);
+  if(!r)return;
+  document.getElementById('edit-id').value=r.id;
+  document.getElementById('edit-lastName').value=r.lastName||'';
+  document.getElementById('edit-firstName').value=r.firstName||'';
+  document.getElementById('edit-city').value=r.city||'';
+  document.getElementById('edit-phone').value=r.phone||'';
+  document.getElementById('edit-email').value=r.email||'';
+  document.getElementById('edit-birthDate').value=r.birthDate||'';
+  document.getElementById('edit-gender').value=r.gender||'';
+  document.getElementById('edit-distance').value=r.distance||'';
+  document.getElementById('edit-tshirtSize').value=r.tshirtSize||'';
+  document.getElementById('edit-team').value=r.team||'';
+  document.getElementById('edit-emergencyName').value=r.emergencyName||'';
+  document.getElementById('edit-emergencyPhone').value=r.emergencyPhone||'';
+  document.getElementById('edit-notes').value=r.notes||'';
+  document.getElementById('edit-modal').classList.add('active');
+}
+
+function closeEdit(){
+  document.getElementById('edit-modal').classList.remove('active');
+}
+
+async function saveEdit(){
+  const id=document.getElementById('edit-id').value;
+  const data={
+    lastName:document.getElementById('edit-lastName').value.trim(),
+    firstName:document.getElementById('edit-firstName').value.trim(),
+    city:document.getElementById('edit-city').value.trim(),
+    phone:document.getElementById('edit-phone').value.trim(),
+    email:document.getElementById('edit-email').value.trim()||null,
+    birthDate:document.getElementById('edit-birthDate').value||null,
+    gender:document.getElementById('edit-gender').value||null,
+    distance:document.getElementById('edit-distance').value,
+    tshirtSize:document.getElementById('edit-tshirtSize').value||null,
+    team:document.getElementById('edit-team').value.trim()||null,
+    emergencyName:document.getElementById('edit-emergencyName').value.trim()||null,
+    emergencyPhone:document.getElementById('edit-emergencyPhone').value.trim()||null,
+    notes:document.getElementById('edit-notes').value.trim()||null,
+  };
+  try{
+    const r=await fetch(SU+'/rest/v1/Registration?id=eq.'+id,{
+      method:'PATCH',
+      headers:{'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(data)
+    });
+    if(!r.ok)throw new Error(r.status);
+    toast('✓ Заявка обновлена');
+    closeEdit();
+    loadData();
+  }catch(e){
+    toast('Ошибка: '+e.message,'err');
+  }
+}
+
+function askDelete(id,name){
+  delId=id;
+  document.getElementById('del-name').textContent=name;
+  document.getElementById('del-modal').classList.add('active');
+}
+
+function closeDelete(){
+  document.getElementById('del-modal').classList.remove('active');
+  delId=null;
+}
+
+async function confirmDelete(){
+  if(!delId)return;
+  try{
+    const r=await fetch(SU+'/rest/v1/Registration?id=eq.'+delId,{
+      method:'DELETE',
+      headers:{'apikey':SK,'Authorization':'Bearer '+SK}
+    });
+    if(!r.ok)throw new Error(r.status);
+    toast('✓ Заявка удалена');
+    closeDelete();
+    loadData();
+  }catch(e){
+    toast('Ошибка: '+e.message,'err');
+  }
+}
+
+function exportCSV(){
+  if(rows.length===0){toast('Нет данных для экспорта','err');return;}
+  const headers=['ФИО','Город','Телефон','Email','Дата рождения','Пол','Дистанция','Футболка','Команда','Экстр.контакт','Экстр.телефон','Комментарий','Подано'];
+  const lines=[headers.join(',')];
+  rows.forEach(r=>{
+    const vals=[
+      (r.lastName+' '+r.firstName),(r.city||''),(r.phone||''),(r.email||''),
+      (r.birthDate||''),(r.gender||''),(DISTANCES[r.distance]||r.distance),
+      (r.tshirtSize||''),(r.team||''),(r.emergencyName||''),(r.emergencyPhone||''),
+      (r.notes||''),new Date(r.createdAt).toLocaleString('ru-RU')
+    ];
+    lines.push(vals.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  });
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`asket-trail-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ CSV скачан');
+}
+
+function toast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(err?' err':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+function esc(s){return s?String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'):''}
+
+// Auto-login if already authenticated
+if(sessionStorage.getItem('admin_ok')==='1'){
+  showDash();
+}
+</script>
+</body>
+</html>
